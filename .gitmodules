@@ -1,0 +1,6 @@
+[submodule "external/io_utils"]
+	path = external/io_utils
+	url = git@github.com:Neburalis/io_utils.git
+[submodule "external/string_and_thong"]
+	path = external/string_and_thong
+	url = git@github.com:Neburalis/string_and_thong.git

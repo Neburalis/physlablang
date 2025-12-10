@@ -1,0 +1,7 @@
+.DS_Store
+.vscode/
+*.out
+*.o
+*.dSYM
+*.bin
+logs/
