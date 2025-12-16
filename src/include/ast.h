@@ -121,4 +121,8 @@ void destruct_node(NODE_T *node);
  */
 bool is_leaf(const NODE_T *node);
 
+bool is_keyword_tok(const TOKEN_T *tok, KEYWORD::KEYWORD kw);
+bool is_operator_tok(const TOKEN_T *tok, OPERATOR::OPERATOR op);
+bool is_delim_tok(const TOKEN_T *tok, DELIMITER::DELIMITER d);
+
 #endif // AST_H

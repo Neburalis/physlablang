@@ -317,6 +317,7 @@ static const char *keyword_name(KEYWORD::KEYWORD kw) {
         STR_CASE_(KEYWORD::ELSE);
         STR_CASE_(KEYWORD::THEN);
         STR_CASE_(KEYWORD::WHILE);
+        STR_CASE_(KEYWORD::DO_WHILE);
         STR_CASE_(KEYWORD::WHILE_CONDITION);
         STR_CASE_(KEYWORD::END_WHILE);
         STR_CASE_(KEYWORD::FOR_START);
@@ -360,7 +361,11 @@ static const char *operator_name(OPERATOR::OPERATOR op) {
         STR_CASE_(OPERATOR::AND);
         STR_CASE_(OPERATOR::OR);
         STR_CASE_(OPERATOR::NOT);
+        STR_CASE_(OPERATOR::MOD);
+        STR_CASE_(OPERATOR::IN);
+        STR_CASE_(OPERATOR::OUT);
         STR_CASE_(OPERATOR::ASSIGNMENT);
+        STR_CASE_(OPERATOR::CONNECTOR);
         default:                   return "OPERATOR::UNKNOWN";
     }
 }

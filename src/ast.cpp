@@ -4,6 +4,21 @@
 #include "ast.h"
 #include "base.h"
 
+/** Проверяет, что токен является заданным ключевым словом. */
+bool is_keyword_tok(const TOKEN_T *tok, KEYWORD::KEYWORD kw) {
+    return tok && tok->node.type == KEYWORD_T && tok->node.value.keyword == kw;
+}
+
+/** Проверяет, что токен является заданным оператором. */
+bool is_operator_tok(const TOKEN_T *tok, OPERATOR::OPERATOR op) {
+    return tok && tok->node.type == OPERATOR_T && tok->node.value.opr == op;
+}
+
+/** Проверяет, что токен является указанным разделителем. */
+bool is_delim_tok(const TOKEN_T *tok, DELIMITER::DELIMITER d) {
+    return tok && tok->node.type == DELIMITER_T && tok->node.value.delimiter == d;
+}
+
 /**
  * @brief Выделяет новый узел AST.
  */
