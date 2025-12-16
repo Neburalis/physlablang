@@ -20,12 +20,12 @@ typedef struct {
     bool              owns_vars,
                       owns_name,
                       owns_buf;
-} FRONT_COMPIL_T;
+} FRONT_COMPL_T;
 
-int lexer_load_file(FRONT_COMPIL_T *ctx, const char *filename);
-int lexer_from_buffer(FRONT_COMPIL_T *ctx, const char *name, const char *text, size_t bytes);
-void lexer_reset(FRONT_COMPIL_T *ctx);
-void dump_lexer_tokens(const FRONT_COMPIL_T *ctx, const char *title);
+int lexer_load_file(FRONT_COMPL_T *ctx, const char *filename);
+int lexer_from_buffer(FRONT_COMPL_T *ctx, const char *name, const char *text, size_t bytes);
+void lexer_reset(FRONT_COMPL_T *ctx);
+void dump_lexer_tokens(const FRONT_COMPL_T *ctx, const char *title);
 
 /**
  * @brief Расширяет динамический массив токенов при необходимости.
@@ -33,7 +33,7 @@ void dump_lexer_tokens(const FRONT_COMPIL_T *ctx, const char *title);
  * @param need[in]      требуемый размер.
  * @return 0 при успехе, -1 при нехватке памяти.
  */
-int ensure_token_cap(FRONT_COMPIL_T *ctx, size_t need);
+int ensure_token_cap(FRONT_COMPL_T *ctx, size_t need);
 
 /**
  * @brief Создает запись о токене в массиве.
@@ -46,7 +46,7 @@ int ensure_token_cap(FRONT_COMPIL_T *ctx, size_t need);
  * @param pos[in]       позиция в строке.
  * @return 0 при успехе, -1 при ошибке.
  */
-int add_token(FRONT_COMPIL_T *ctx,
+int add_token(FRONT_COMPL_T *ctx,
     NODE_TYPE type, NODE_VALUE_T value,
     const char *text, size_t len, int32_t line, int32_t pos
 );

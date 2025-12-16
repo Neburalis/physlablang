@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    FRONT_COMPIL_T ctx = {};
+    FRONT_COMPL_T ctx = {};
     if (lexer_load_file(&ctx, input) != 0) {
         fprintf(stderr, "lexer failed on \"%s\"\n", input);
         destruct_logger();

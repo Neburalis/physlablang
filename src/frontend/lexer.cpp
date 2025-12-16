@@ -108,7 +108,7 @@ static const fixed_token_t g_fixed[] = {
  * @param ctx[in,out]   контекст компилятора.
  * @return 0 если готово, -1 при ошибке.
  */
-static int ensure_varlist(FRONT_COMPIL_T *ctx);
+static int ensure_varlist(FRONT_COMPL_T *ctx);
 
 /**
  * @brief Создает токен на основе записи из таблицы g_fixed.
@@ -119,7 +119,7 @@ static int ensure_varlist(FRONT_COMPIL_T *ctx);
  * @param pos[in]       позиция в строке.
  * @return 0 при успехе, -1 при ошибке.
  */
-static int emit_fixed(FRONT_COMPIL_T *ctx,
+static int emit_fixed(FRONT_COMPL_T *ctx,
     const fixed_token_t *ft, size_t idx, int32_t line, int32_t pos
 );
 
@@ -130,7 +130,7 @@ static int emit_fixed(FRONT_COMPIL_T *ctx,
  * @param len[in]       длина в байтах.
  * @return индекс в VarList или varlist::NPOS.
  */
-static size_t store_span(FRONT_COMPIL_T *ctx, const char *text, size_t len);
+static size_t store_span(FRONT_COMPL_T *ctx, const char *text, size_t len);
 
 /**
  * @brief Обновляет счетчики строки/позиции для диапазона UTF-8.
@@ -161,7 +161,7 @@ static const fixed_token_t *match_fixed(const char *buf, size_t len,
  * @param ctx[in,out]   контекст компилятора.
  * @return 0 при успехе, -1 при ошибке.
  */
-static int lex_buffer(FRONT_COMPIL_T *ctx);
+static int lex_buffer(FRONT_COMPL_T *ctx);
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -174,7 +174,7 @@ static int lex_buffer(FRONT_COMPIL_T *ctx);
  * @return 0 при успехе, -1 иначе.
  */
 int lexer_from_buffer(
-    FRONT_COMPIL_T *ctx,
+    FRONT_COMPL_T *ctx,
     const char *name, const char *text, size_t bytes
 ) {
     if (!ctx || !text) return -1;
@@ -207,7 +207,7 @@ int lexer_from_buffer(
  * @param filename[in]  путь к файлу.
  * @return 0 при успехе, -1 иначе.
  */
-int lexer_load_file(FRONT_COMPIL_T *ctx, const char *filename) {
+int lexer_load_file(FRONT_COMPL_T *ctx, const char *filename) {
     if (!ctx || !filename) return -1;
     size_t buf_len = 0;
     char *buf = read_file_to_buf(filename, &buf_len);
@@ -223,7 +223,7 @@ int lexer_load_file(FRONT_COMPIL_T *ctx, const char *filename) {
  * @brief Освобождает буферы, токены и VarList.
  * @param ctx[in,out]   контекст компилятора.
  */
-void lexer_reset(FRONT_COMPIL_T *ctx) {
+void lexer_reset(FRONT_COMPL_T *ctx) {
     if (!ctx) return;
     if (ctx->owns_buf && ctx->buf) free(ctx->buf);
     ctx->buf = NULL;
@@ -253,7 +253,7 @@ void lexer_reset(FRONT_COMPIL_T *ctx) {
  * @param ctx[in,out] контекст компилятора.
  * @return 0 если готово, -1 при ошибке.
  */
-static int ensure_varlist(FRONT_COMPIL_T *ctx) {
+static int ensure_varlist(FRONT_COMPL_T *ctx) {
     if (ctx->vars) return 0;
     varlist::VarList *list = TYPED_MALLOC(varlist::VarList);
     if (!list) return -1;
@@ -269,7 +269,7 @@ static int ensure_varlist(FRONT_COMPIL_T *ctx) {
  * @param need[in] требуемый размер.
  * @return 0 при успехе, -1 при нехватке памяти.
  */
-int ensure_token_cap(FRONT_COMPIL_T *ctx, size_t need) {
+int ensure_token_cap(FRONT_COMPL_T *ctx, size_t need) {
     if (ctx->token_capacity >= need) return 0;
     size_t cap = ctx->token_capacity ? ctx->token_capacity : 32;
     while (cap < need) cap <<= 1;
@@ -292,7 +292,7 @@ int ensure_token_cap(FRONT_COMPIL_T *ctx, size_t need) {
  * @return 0 при успехе, -1 при ошибке.
  */
 int add_token(
-    FRONT_COMPIL_T *ctx,
+    FRONT_COMPL_T *ctx,
     NODE_TYPE type, NODE_VALUE_T value,
     const char *text, size_t len, int32_t line, int32_t pos
 ) {
@@ -320,7 +320,7 @@ int add_token(
  * @param len[in]  длина в байтах.
  * @return индекс в VarList или varlist::NPOS.
  */
-static size_t store_span(FRONT_COMPIL_T *ctx, const char *text, size_t len) {
+static size_t store_span(FRONT_COMPL_T *ctx, const char *text, size_t len) {
     if (ensure_varlist(ctx)) return varlist::NPOS;
     char *tmp = strndup(text, len);
     if (!tmp) return varlist::NPOS;
@@ -406,7 +406,7 @@ static const fixed_token_t *match_fixed(
  * @return 0 при успехе, -1 при ошибке.
  */
 static int emit_fixed(
-    FRONT_COMPIL_T *ctx,
+    FRONT_COMPL_T *ctx,
     const fixed_token_t *ft, size_t idx, int32_t line, int32_t pos
 ) {
     NODE_VALUE_T val;
@@ -427,7 +427,7 @@ static int emit_fixed(
  * @param ctx[in,out]   контекст компилятора.
  * @return 0 при успехе, -1 при ошибке.
  */
-static int lex_buffer(FRONT_COMPIL_T *ctx) {
+static int lex_buffer(FRONT_COMPL_T *ctx) {
     if (!ctx || !ctx->buf) return -1;
     const char *buf = ctx->buf;
     size_t len = ctx->buf_len;

@@ -1,4 +1,4 @@
-Примерный РБНФ:
+## Примерный РБНФ:
 ```
 program ::= report
 
@@ -108,7 +108,7 @@ internal_func ::=
     | binary_func "(" expression, expression ")"
 
 unary_func ::=
-    "sin" | "cos" | "tg" | "tan" | "ctg" 
+    "sin" | "cos" | "tg" | "tan" | "ctg"
     | "asin" | "arcsin" | "acos" | "arccos"
     | "atan" | "arctan" | "arctg"
     | "actg" | "arcctg"
@@ -139,8 +139,9 @@ one_line_string ::= "\"\"\"" literal "\"\"\""
 literal ::= [^\"^\n]*
 ```
 
-Правила для лексического анализа:
-Все ключевые слова могут писаться как в верхнем так и в нижнем регистре. Для переменных (идентефикаторов) регист имеет значение.
+## Правила для лексического анализа
+Все ключевые слова могут писаться как в верхнем так и в нижнем регистре. Для переменных (идентификаторов) регистр имеет значение.
+```
 комментарий (// text_literal) -> ничто
 "(" -> DELIMITER.PAR_OPEN
 ")" -> DELIMITER.PAR_CLOSE
@@ -164,18 +165,16 @@ literal ::= [^\"^\n]*
 "cos" -> OPERATOR.COS
 "tan" -> OPERATOR.TAN
 "tg" -> OPERATOR.TAN
-"ctan" -> OPERATOR.CTG
 "ctg" -> OPERATOR.CTG
-"arcsin" -> OPERATOR.ASIN
 "asin" -> OPERATOR.ASIN
-"arccos" -> OPERATOR.ACOS
+"arcsin" -> OPERATOR.ASIN
 "acos" -> OPERATOR.ACOS
+"arccos" -> OPERATOR.ACOS
+"atan" -> OPERATOR.ATAN
 "arctan" -> OPERATOR.ATAN
 "arctg" -> OPERATOR.ATAN
-"atan" -> OPERATOR.ATAN
-"arcctg" -> OPERATOR.ACTG
-"arcctan" -> OPERATOR.ACTG
 "actg" -> OPERATOR.ACTG
+"arcctg" -> OPERATOR.ACTG
 "sqrt" -> OPERATOR.SQRT
 "and" -> OPERATOR.AND
 "И" -> OPERATOR.AND
@@ -186,7 +185,7 @@ literal ::= [^\"^\n]*
 "ЛАБОРАТОРНАЯ РАБОТА" -> KEYWORD.LAB
 "АННОТАЦИЯ" -> KEYWORD.ANNOTATION
 "КОНЕЦ АННОТАЦИИ" -> KEYWORD.END_ANNOTATION
-"ТЕОРЕТИЧЕСКИЕ СВЕДИНИЯ" -> KEYWORD.THEORETICAL
+"ТЕОРЕТИЧЕСКИЕ СВЕДЕНИЯ" -> KEYWORD.THEORETICAL
 "КОНЕЦ ТЕОРИИ" -> KEYWORD.END_THEORETICAL
 "ХОД РАБОТЫ" -> KEYWORD.EXPERIMENTAL
 "КОНЕЦ РАБОТЫ" -> KEYWORD.END_EXPERIMENTAL
@@ -215,6 +214,7 @@ literal ::= [^\"^\n]*
 
 число -> NUMBER.значение
 идентификатор -> идентификатор
+```
 
 ## Построение AST
 
@@ -242,7 +242,7 @@ KEYWORD.END_WHILE
 ```
 где expression предполагает дерево условия, а operators - дерево тела цикла
 
-Тоесть в левом поддереве цикла лежит условие, а в правом само тело.
+То есть в левом поддереве цикла лежит условие, а в правом само тело.
 
 **Для do-while цикла**:
 
@@ -263,7 +263,7 @@ KEYWORD.END_WHILE
 ```
 (KEYWORD.DO_WHILE (expression) (operators))
 ```
-Тоесть в левом поддереве цикла также лежит условие, а в правом само тело. (При это нужно заменить значение токена с KEYWORD.WHILE на KEYWORD.DO_WHILE)
+То есть в левом поддереве цикла также лежит условие, а в правом само тело. (При это нужно заменить значение токена с KEYWORD.WHILE на KEYWORD.DO_WHILE)
 
 ### условный оператор
 
@@ -337,7 +337,7 @@ op2
 
 Он необходим т.к. дерево бинарное
 
-Тоесть при парсинге operators ::= operator+ грамматика должна его создавать для каждого считанного оператора
+То есть при парсинге `operators ::= operator+` грамматика должна создавать CONNECTOR для каждого считанного оператора
 
 Например:
 ```physlab
@@ -490,9 +490,11 @@ id = expr
 
 Операторы ввода/вывода и встроенные алгебраические функции работают также как и простейшие математические функции (но в основном унарные а не бинарные)
 
-ИЗМЕРИТЬ x -> (OPERATOR.IN  (LITERAL 1 "x") nil)
-sin (x) ->    (OPERATOR.SIN (LITERAL 1 "x") nil)
-ВЫВЕСТИ x ->  (OPERATOR.OUT (LITERAL 1 "x") nil)
+`ИЗМЕРИТЬ x -> (OPERATOR.IN  (LITERAL 1 "x") nil)`
+
+`sin (x) ->    (OPERATOR.SIN (LITERAL 1 "x") nil)`
+
+`ВЫВЕСТИ x ->  (OPERATOR.OUT (LITERAL 1 "x") nil)`
 
 ### Операторы и выражения лежат "как есть"
 `x >= 0 И x + 1 < 15` ->

@@ -396,7 +396,7 @@ static void html_escape(FILE *out, const char *text, size_t len) {
     }
 }
 
-static void print_token_value(const FRONT_COMPIL_T *ctx, const TOKEN_T *tok, FILE *out) {
+static void print_token_value(const FRONT_COMPL_T *ctx, const TOKEN_T *tok, FILE *out) {
     if (!tok || !out) return;
     switch (tok->node.type) {
         case KEYWORD_T: {
@@ -463,7 +463,7 @@ static void print_token_value(const FRONT_COMPIL_T *ctx, const TOKEN_T *tok, FIL
     }
 }
 
-void dump_lexer_tokens(const FRONT_COMPIL_T *ctx, const char *title) {
+void dump_lexer_tokens(const FRONT_COMPL_T *ctx, const char *title) {
     FILE *log_file = logger_get_file();
     if (!ctx || !log_file) return;
 
