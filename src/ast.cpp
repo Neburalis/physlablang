@@ -70,3 +70,121 @@ void destruct_node(NODE_T *node) {
     destruct_node(node->right);
     free(node);
 }
+
+/**
+ * @brief Устанавливает потомков у узла и обновляет обратные ссылки.
+ */
+void set_children(NODE_T *parent, NODE_T *left, NODE_T *right) {
+    if (!parent) return;
+    parent->left = left;
+    parent->right = right;
+    if (left) left->parent = parent;
+    if (right) right->parent = parent;
+}
+
+/**
+ * @brief Пересчитывает поле elements для поддерева.
+ */
+size_t recount_elements(NODE_T *node) {
+    if (!node) return 0;
+    size_t total = 0;
+    if (node->left) {
+        node->left->parent = node;
+        total += recount_elements(node->left) + 1;
+    }
+    if (node->right) {
+        node->right->parent = node;
+        total += recount_elements(node->right) + 1;
+    }
+    node->elements = total;
+    return total;
+}
+
+/**
+ * @brief Проверяет, может ли токен начинать оператор.
+ */
+bool is_operator_start(const TOKEN_T *tok) {
+    if (!tok) return false;
+    if (tok->node.type == KEYWORD_T) {
+        switch (tok->node.value.keyword) {
+            case KEYWORD::VAR_DECLARATION:
+            case KEYWORD::IF:
+            case KEYWORD::WHILE:
+            case KEYWORD::WHILE_CONDITION:
+            case KEYWORD::RETURN:
+            case KEYWORD::FUNC_CALL:
+                return true;
+            default:
+                break;
+        }
+        if (keyword_is_io(tok))
+            return true;
+        return false;
+    }
+    if (tok->node.type == IDENTIFIER_T)
+        return true;
+    if (tok->node.type == OPERATOR_T) {
+        switch (tok->node.value.opr) {
+            case OPERATOR::OUT:
+            case OPERATOR::IN:
+                return true;
+            default:
+                break;
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief Проверяет, должен ли парсер остановить чтение операторов.
+ */
+bool is_operator_stop(const TOKEN_T *tok, KEYWORD::KEYWORD stop_kw) {
+    if (!tok) return true;
+    if (tok->node.type != KEYWORD_T)
+        return false;
+    KEYWORD::KEYWORD kw = tok->node.value.keyword;
+    if (kw == stop_kw)
+        return true;
+    switch (kw) {
+        case KEYWORD::ELSE:
+        case KEYWORD::END_WHILE:
+        case KEYWORD::END_FORMULA:
+        case KEYWORD::END_EXPERIMENTAL:
+        case KEYWORD::END_RESULTS:
+        case KEYWORD::END_THEORETICAL:
+        case KEYWORD::END_CONCLUSION:
+        case KEYWORD::END_ANNOTATION:
+            return true;
+        default:
+            return false;
+    }
+}
+
+/**
+ * @brief Проверяет, является ли оператор унарной встроенной функцией.
+ */
+bool is_unary_builtin(OPERATOR::OPERATOR op) {
+    switch (op) {
+        case OPERATOR::SIN:
+        case OPERATOR::COS:
+        case OPERATOR::TAN:
+        case OPERATOR::CTG:
+        case OPERATOR::ASIN:
+        case OPERATOR::ACOS:
+        case OPERATOR::ATAN:
+        case OPERATOR::ACTG:
+        case OPERATOR::SQRT:
+        case OPERATOR::LN:
+        case OPERATOR::NOT:
+            return true;
+        default:
+            return false;
+    }
+}
+
+/**
+ * @brief Проверяет, является ли оператор бинарной встроенной функцией.
+ */
+bool is_binary_builtin(OPERATOR::OPERATOR op) {
+    return op == OPERATOR::POW;
+}

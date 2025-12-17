@@ -45,7 +45,6 @@ static const fixed_token_t g_fixed[] = {
     FIXED("ПОКАЗАТЬ",                 KEYWORD_T,  OPERATOR::OUT,             y, y),
     FIXED("ИЗМЕРИТЬ",                 KEYWORD_T,  OPERATOR::IN,              y, y),
     FIXED("ФОРМУЛА",                  KEYWORD_T,  KEYWORD::FORMULA,          y, y),
-    FIXED("ВЫРАЗИМ",                  KEYWORD_T,  KEYWORD::LET_ASSIGNMENT,   y, y),
     FIXED("ВЫВЕСТИ",                  KEYWORD_T,  OPERATOR::OUT,             y, y),
     FIXED("ARCCTAN",                  OPERATOR_T, OPERATOR::ACTG,            y, y),
     FIXED("ВЫВОДЫ",                   KEYWORD_T,  KEYWORD::CONCLUSION,       y, y),
@@ -53,8 +52,6 @@ static const fixed_token_t g_fixed[] = {
     FIXED("ARCCOS",                   OPERATOR_T, OPERATOR::ACOS,            y, y),
     FIXED("ARCTAN",                   OPERATOR_T, OPERATOR::ATAN,            y, y),
     FIXED("ARCCTG",                   OPERATOR_T, OPERATOR::ACTG,            y, y),
-    FIXED("ПУСТЬ",                    KEYWORD_T,  KEYWORD::LET_ASSIGNMENT,   y, y),
-    FIXED("БУДЕТ",                    KEYWORD_T,  KEYWORD::LET_ASSIGNMENT,   y, y),
     FIXED("ИНАЧЕ",                    KEYWORD_T,  KEYWORD::ELSE,             y, y),
     FIXED("ARCTG",                    OPERATOR_T, OPERATOR::ATAN,            y, y),
     FIXED("ЦЕЛЬ",                     KEYWORD_T,  KEYWORD::GOAL_LITERAL,     y, y),
@@ -226,21 +223,21 @@ int lexer_load_file(FRONT_COMPL_T *ctx, const char *filename) {
 void lexer_reset(FRONT_COMPL_T *ctx) {
     if (!ctx) return;
     if (ctx->owns_buf && ctx->buf) free(ctx->buf);
-    ctx->buf = NULL;
+    ctx->buf = nullptr;
     ctx->buf_len = 0;
     ctx->owns_buf = false;
     if (ctx->tokens) free(ctx->tokens);
-    ctx->tokens = NULL;
+    ctx->tokens = nullptr;
     ctx->token_count = 0;
     ctx->token_capacity = 0;
     if (ctx->owns_name && ctx->name) free((void *)ctx->name);
-    ctx->name = NULL;
+    ctx->name = nullptr;
     ctx->owns_name = false;
-    ctx->root = NULL;
+    ctx->root = nullptr;
     if (ctx->owns_vars && ctx->vars) {
         varlist::destruct(ctx->vars);
         free(ctx->vars);
-        ctx->vars = NULL;
+        ctx->vars = nullptr;
         ctx->owns_vars = false;
     }
 }
@@ -302,9 +299,9 @@ int add_token(
     tok->node.type = type;
     tok->node.value = value;
     tok->node.elements = 0;
-    tok->node.left = NULL;
-    tok->node.right = NULL;
-    tok->node.parent = NULL;
+    tok->node.left = nullptr;
+    tok->node.right = nullptr;
+    tok->node.parent = nullptr;
     tok->text = text;
     tok->length = len;
     tok->line = line;
@@ -510,7 +507,7 @@ static int lex_buffer(FRONT_COMPL_T *ctx) {
             memcpy(num, buf + start, num_len);
             num[num_len] = '\0';
             NODE_VALUE_T val;
-            val.num = strtod(num, NULL);
+            val.num = strtod(num, nullptr);
             free(num);
             if (add_token(ctx, NUMBER_T, val, buf + start, num_len, line, pos)) return -1;
             advance_pos(buf, start, idx, &line, &pos);

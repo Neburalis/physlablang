@@ -44,7 +44,7 @@ static int ensure_dir(const char *path) {
 
 int main(int argc, char **argv) {
     char exe_path[PATH_MAX] = ".";
-    if (realpath(argv[0], exe_path) == NULL)
+    if (realpath(argv[0], exe_path) == nullptr)
         strncpy(exe_path, ".", sizeof(exe_path));
 
     char base_dir[PATH_MAX] = ".";
@@ -88,6 +88,20 @@ int main(int argc, char **argv) {
     }
 
     dump_lexer_tokens(&ctx, input);
+
+    if (parse_tokens(&ctx) != 0) {
+        fprintf(stderr, "parser failed on \"%s\"\n", input);
+        lexer_reset(&ctx);
+        destruct_logger();
+        return 1;
+    }
+
+    if (save_ast_to_file(&ctx, "test.ast")) {
+        fprintf(stderr, "save failed");
+        lexer_reset(&ctx);
+        destruct_logger();
+        return 1;
+    }
 
     lexer_reset(&ctx);
     destruct_logger();

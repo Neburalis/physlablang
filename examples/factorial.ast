@@ -1,0 +1,159 @@
+(
+    ;
+    (
+        LITERAL 3 "factorial"
+        (
+            LITERAL 4 "n"  
+        )
+        (
+            ;
+            (
+                ;
+                (
+                    ;
+                    (
+                        ;
+                        (
+                            VAR_DECLARATION
+                            (
+                                LITERAL 5 "result"  
+                            ) 
+                        )
+                        (
+                            =
+                            (
+                                LITERAL 5 "result"  
+                            )
+                            1
+                        )
+                    )
+                    (
+                        ;
+                        (
+                            VAR_DECLARATION
+                            (
+                                LITERAL 6 "i"  
+                            ) 
+                        )
+                        (
+                            =
+                            (
+                                LITERAL 6 "i"  
+                            )
+                            1
+                        )
+                    )
+                )
+                (
+                    WHILE
+                    (
+                        <
+                        (
+                            LITERAL 6 "i"  
+                        )
+                        (
+                            LITERAL 4 "n"  
+                        )
+                    )
+                    (
+                        =
+                        (
+                            LITERAL 5 "result"  
+                        )
+                        (
+                            *
+                            (
+                                LITERAL 5 "result"  
+                            )
+                            (
+                                FUNC_CALL
+                                (
+                                    LITERAL 6 "i"  
+                                )
+                                (
+                                    =
+                                    (
+                                        LITERAL 6 "i"  
+                                    )
+                                    (
+                                        +
+                                        (
+                                            LITERAL 6 "i"  
+                                        )
+                                        1
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+            (
+                RETURN
+                (
+                    LITERAL 5 "result"  
+                ) 
+            )
+        )
+    )
+    (
+        ;
+        (
+            ;
+            (
+                ;
+                (
+                    ;
+                    (
+                        VAR_DECLARATION
+                        (
+                            LITERAL 7 "input"  
+                        ) 
+                    )
+                    (
+                        IN
+                        (
+                            LITERAL 7 "input"  
+                        ) 
+                    )
+                )
+                (
+                    ;
+                    (
+                        VAR_DECLARATION
+                        (
+                            LITERAL 3 "factorial"  
+                        ) 
+                    )
+                    (
+                        =
+                        (
+                            LITERAL 3 "factorial"  
+                        )
+                        (
+                            FUNC_CALL
+                            (
+                                LITERAL 3 "factorial"  
+                            )
+                            (
+                                LITERAL 7 "input"  
+                            )
+                        )
+                    )
+                )
+            )
+            (
+                OUT
+                (
+                    LITERAL 3 "factorial"  
+                ) 
+            )
+        )
+        (
+            OUT
+            (
+                LITERAL 8 "done"  
+            ) 
+        )
+    )
+)

@@ -28,6 +28,13 @@ void lexer_reset(FRONT_COMPL_T *ctx);
 void dump_lexer_tokens(const FRONT_COMPL_T *ctx, const char *title);
 
 /**
+ * @brief Выполняет синтаксический разбор массива токенов и строит AST.
+ * @param ctx[in,out] контекст компилятора с заполненным лексическим буфером.
+ * @return 0 при успехе, -1 при ошибке.
+ */
+int parse_tokens(FRONT_COMPL_T *ctx);
+
+/**
  * @brief Расширяет динамический массив токенов при необходимости.
  * @param ctx[in]       контекст компилятора.
  * @param need[in]      требуемый размер.
@@ -50,5 +57,13 @@ int add_token(FRONT_COMPL_T *ctx,
     NODE_TYPE type, NODE_VALUE_T value,
     const char *text, size_t len, int32_t line, int32_t pos
 );
+
+/**
+ * @brief Сохраняет текущее AST в файл в префиксной форме.
+ * @param ctx[in]   контекст с построенным деревом.
+ * @param path[in]  путь к файлу.
+ * @return 0 при успехе, -1 при ошибке.
+ */
+int save_ast_to_file(const FRONT_COMPL_T *ctx, const char *path);
 
 #endif //FRONTEND_H

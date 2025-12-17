@@ -320,16 +320,10 @@ static const char *keyword_name(KEYWORD::KEYWORD kw) {
         STR_CASE_(KEYWORD::DO_WHILE);
         STR_CASE_(KEYWORD::WHILE_CONDITION);
         STR_CASE_(KEYWORD::END_WHILE);
-        STR_CASE_(KEYWORD::FOR_START);
-        STR_CASE_(KEYWORD::FOR_END);
         STR_CASE_(KEYWORD::FORMULA);
         STR_CASE_(KEYWORD::END_FORMULA);
         STR_CASE_(KEYWORD::VAR_DECLARATION);
-        STR_CASE_(KEYWORD::VAR_ASSIGNMENT);
-        STR_CASE_(KEYWORD::LET_ASSIGNMENT);
-        STR_CASE_(KEYWORD::FUNCTION_CALL);
-        STR_CASE_(KEYWORD::IN);
-        STR_CASE_(KEYWORD::OUT);
+        STR_CASE_(KEYWORD::FUNC_CALL);
         STR_CASE_(KEYWORD::RETURN);
         default:                         return "KEYWORD::UNKNOWN";
     }

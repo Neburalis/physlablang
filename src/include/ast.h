@@ -27,8 +27,7 @@ namespace KEYWORD {
         IF, ELSE, THEN,
         WHILE, DO_WHILE, WHILE_CONDITION, END_WHILE,
         FORMULA, END_FORMULA,
-        VAR_DECLARATION, VAR_ASSIGNMENT,
-        LET_ASSIGNMENT,
+        VAR_DECLARATION,
         FUNC_CALL,
         RETURN,
     };
@@ -124,5 +123,38 @@ bool is_leaf(const NODE_T *node);
 bool is_keyword_tok(const TOKEN_T *tok, KEYWORD::KEYWORD kw);
 bool is_operator_tok(const TOKEN_T *tok, OPERATOR::OPERATOR op);
 bool is_delim_tok(const TOKEN_T *tok, DELIMITER::DELIMITER d);
+
+/**
+ * @brief Устанавливает потомков у узла и обновляет обратные ссылки.
+ */
+void set_children(NODE_T *parent, NODE_T *left, NODE_T *right);
+
+/**
+ * @brief Пересчитывает поле elements для поддерева.
+ */
+size_t recount_elements(NODE_T *node);
+
+/**
+ * @brief Возвращает true если ключевое слово на самом деле кодирует IN/OUT.
+ */
+static inline bool keyword_is_io(const TOKEN_T *tok) {
+    if (!tok || tok->node.type != KEYWORD_T)
+        return false;
+    int raw = (int) tok->node.value.keyword;
+    return raw == (int) OPERATOR::OUT || raw == (int) OPERATOR::IN;
+}
+
+/**
+ * @brief Проверяет, может ли токен начинать оператор.
+ */
+bool is_operator_start(const TOKEN_T *tok);
+
+/**
+ * @brief Проверяет, должен ли парсер остановить чтение операторов.
+ */
+bool is_operator_stop(const TOKEN_T *tok, KEYWORD::KEYWORD stop_kw);
+
+bool     is_unary_builtin(OPERATOR::OPERATOR op);
+bool     is_binary_builtin(OPERATOR::OPERATOR op);
 
 #endif // AST_H
