@@ -66,4 +66,14 @@ int add_token(FRONT_COMPL_T *ctx,
  */
 int save_ast_to_file(const FRONT_COMPL_T *ctx, const char *path);
 
+/**
+ * @brief Строит dot+svg дамп AST (подробный стиль).
+ */
+void full_dump(const FRONT_COMPL_T *ctx);
+
+/**
+ * @brief Строит dot+svg дамп AST (упрощенный стиль).
+ */
+void simple_dump(const FRONT_COMPL_T *ctx);
+
 #endif //FRONTEND_H

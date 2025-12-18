@@ -714,6 +714,11 @@ static NODE_T *get_function_call(parser_t *p) {
     if (match_delim(p, DELIMITER::PAR_OPEN, nullptr))
         has_parens = true;
 
+    if (!had_keyword && !has_parens) {
+        p->pos = start;
+        return nullptr;
+    }
+
     NODE_T *args = get_arguments(p);
     if (!args) {
         p->pos = start;

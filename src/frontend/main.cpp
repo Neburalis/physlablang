@@ -96,6 +96,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    full_dump(&ctx);
+    simple_dump(&ctx);
+
     if (save_ast_to_file(&ctx, "test.ast")) {
         fprintf(stderr, "save failed");
         lexer_reset(&ctx);

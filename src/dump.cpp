@@ -14,276 +14,12 @@ const char *node_type_name(const NODE_T *node) {
         case NUMBER_T: return "NUMBER";
         case OPERATOR_T:  return "OPERATOR";
         case IDENTIFIER_T: return "VARIABLE";
+        case KEYWORD_T: return "KEYWORD";
+        case LITERAL_T: return "LITERAL";
+        case DELIMITER_T: return "DELIMITER";
         default:    return "UNKNOWN";
     }
 }
-
-function const char *node_type_color(const NODE_T *node) {
-    if (!node) return "#f2f2f2";
-    switch (node->type) {
-        case NUMBER_T: return "#fff2cc";
-        case OPERATOR_T:  return "#cfe2ff";
-        case IDENTIFIER_T: return "#d4f8d4";
-        default:    return "#f2f2f2";
-    }
-}
-
-function const char *node_type_shape(const NODE_T *node) {
-    if (!node) return "hexagon";
-    switch (node->type) {
-        case NUMBER_T: return "box";
-        case OPERATOR_T:  return "ellipse";
-        case IDENTIFIER_T: return "diamond";
-        default:    return "hexagon";
-    }
-}
-
-function const char *node_type_font_size(const NODE_T *node) {
-    if (!node) return "10pt";
-    switch (node->type) {
-        case NUMBER_T: return "10pt";
-        case OPERATOR_T:  return "20pt";
-        case IDENTIFIER_T: return "10pt";
-        default:    return "10pt";
-    }
-}
-
-const char *operator_symbol(OPERATOR::OPERATOR op) {
-    switch (op) {
-        case OPERATOR::ADD:   return "+";
-        case OPERATOR::SUB:   return "-";
-        case OPERATOR::MUL:   return "*";
-        case OPERATOR::DIV:   return "/";
-        case OPERATOR::POW:   return "^";
-        case OPERATOR::LN:    return "ln";
-        case OPERATOR::SIN:   return "sin";
-        case OPERATOR::COS:   return "cos";
-        case OPERATOR::TAN:   return "tan";
-        case OPERATOR::CTG:   return "ctg";
-        case OPERATOR::ASIN:  return "arcsin";
-        case OPERATOR::ACOS:  return "arccos";
-        case OPERATOR::ATAN:  return "arctan";
-        case OPERATOR::ACTG:  return "arccot";
-        case OPERATOR::SQRT:  return "sqrt";
-        default:    return "?";
-    }
-}
-
-// void format_node_value(const EQ_TREE_T *eqtree, const NODE_T *node, char *buf, size_t size) {
-//     if (!node || !buf || !size) return;
-//     switch (node->type) {
-//         case NUMBER_T:
-//             snprintf(buf, size, "%lf", node->value.num);
-//             break;
-//         case OPERATOR_T:
-//             snprintf(buf, size, "%s", operator_symbol(node->value.opr));
-//             break;
-//         case IDENTIFIER_T:
-//             snprintf(buf, size, "%s at [%zu]", eqtree->vars->data[node->value.var].str, node->value.var);
-//             break;
-//         default:
-//             snprintf(buf, size, "-");
-//             break;
-//     }
-// }
-
-// function int write_node_full(EQ_TREE_T *eqtree, NODE_T *subtree, FILE *fp, int *id_counter) {
-//     if (!subtree || !fp || !id_counter) return -1;
-//     int my_id = (*id_counter)++;
-//
-//     char value_buf[64] = "";
-//     format_node_value(eqtree, subtree, value_buf, sizeof(value_buf));
-//
-//     // const char *color = (subtree == highlight) ? "#ceffb7" : node_type_color(subtree);
-//     const char *color = node_type_color(subtree);
-//
-//     if (subtree->elements != 0)
-//         fprintf(fp,
-//                 "\tnode%d [label=\"{ ptr=%p | type=%s | value=%s | { left=%p | right=%p } | parent=%p | size=%zu }\", shape=record, style=filled, fillcolor=\"%s\"];\n",
-//                 my_id,
-//                 (void *)subtree,
-//                 node_type_name(subtree),
-//                 value_buf,
-//                 (void *)subtree->left,
-//                 (void *)subtree->right,
-//                 (void *)subtree->parent,
-//                 subtree->elements,
-//                 color);
-//     else
-//         fprintf(fp,
-//                 "\tnode%d [label=\"{ ptr=%p | type=%s | value=%s | { left=%p | right=%p } | parent=%p }\", shape=record, style=filled, fillcolor=\"%s\"];\n",
-//                 my_id,
-//                 (void *)subtree,
-//                 node_type_name(subtree),
-//                 value_buf,
-//                 (void *)subtree->left,
-//                 (void *)subtree->right,
-//                 (void *)subtree->parent,
-//                 color);
-//
-//     if (subtree->left) {
-//         int left_id = write_node_full(eqtree, subtree->left, fp, id_counter);
-//         if (left_id >= 0)
-//             fprintf(fp, "\tnode%d -> node%d [color=\"#0c0ccc\", label=\"L\", constraint=true];\n", my_id, left_id);
-//     }
-//
-//     if (subtree->right) {
-//         int right_id = write_node_full(eqtree, subtree->right, fp, id_counter);
-//         if (right_id >= 0)
-//             fprintf(fp, "\tnode%d -> node%d [color=\"#3dad3d\", label=\"R\", constraint=true];\n", my_id, right_id);
-//     }
-//
-//     return my_id;
-// }
-//
-// function int write_node_simple(EQ_TREE_T *eqtree, NODE_T *subtree, FILE *fp, int *id_counter) {
-//     if (!subtree || !fp || !id_counter) return -1;
-//     int my_id = (*id_counter)++;
-//
-//     char value_buf[64] = "";
-//     format_node_value(eqtree, subtree, value_buf, sizeof(value_buf));
-//
-//     const char *shape = node_type_shape(subtree);
-//     const char *color = node_type_color(subtree);
-//     const char *fontsize = node_type_font_size(subtree);
-//
-//     fprintf(fp,
-//             "\tnode%d [label=\"%s\", shape=%s, style=filled, fillcolor=\"%s\", fontsize=\"%s\"];\n",
-//             my_id,
-//             value_buf,
-//             shape,
-//             color,
-//             fontsize
-//         );
-//
-//     if (subtree->left) {
-//         int left_id = write_node_simple(eqtree, subtree->left, fp, id_counter);
-//         if (left_id >= 0)
-//             fprintf(fp, "\tnode%d -> node%d [color=\"#0c0ccc\", label=\"L\", constraint=true];\n", my_id, left_id);
-//     }
-//
-//     if (subtree->right) {
-//         int right_id = write_node_simple(eqtree, subtree->right, fp, id_counter);
-//         if (right_id >= 0)
-//             fprintf(fp, "\tnode%d -> node%d [color=\"#3dad3d\", label=\"R\", constraint=true];\n", my_id, right_id);
-//     }
-//
-//     return my_id;
-// }
-//
-// function void generate_dot_dump(EQ_TREE_T *eqtree, bool is_simple, FILE *fp) {
-//     if (!fp) return;
-//     fprintf(fp,
-//             "digraph EquationTree {\n"
-//             "\trankdir=TB;\n"
-//             "\tnode [fontname=\"Helvetica\", fontsize=10];\n"
-//             "\tedge [arrowsize=0.8];\n"
-//             "\tgraph [splines=true, concentrate=false];\n\n");
-//
-//     if (!eqtree) {
-//         fprintf(fp, "\t// empty tree\n\n\tlabel = \"empty tree\";\n");
-//         fprintf(fp, "}\n");
-//         return;
-//     }
-//
-//     int id_counter = 0;
-//     if (is_simple)
-//         write_node_simple(eqtree, eqtree->root, fp, &id_counter);
-//     else
-//         write_node_full(eqtree, eqtree->root, fp, &id_counter);
-//     fprintf(fp, "}\n");
-// }
-//
-// function int generate_files(EQ_TREE_T *eqtree, bool is_simple, const char *dir, char *out_basename, size_t out_size) {
-//     local size_t dump_counter = 0;
-//     const char *outdir = (dir && dir[0] != '\0') ? dir : ".";
-//     size_t outdir_len = strlen(outdir);
-//
-//     char dot_path[512] = "";
-//     if (outdir_len && outdir[outdir_len - 1] == '/')
-//         snprintf(dot_path, sizeof(dot_path), "%stree_dump_%zu.dot.tmp", outdir, dump_counter);
-//     else
-//         snprintf(dot_path, sizeof(dot_path), "%s/tree_dump_%zu.dot.tmp", outdir, dump_counter);
-//
-//     FILE *fp = fopen(dot_path, "w");
-//     if (!fp) return -1;
-//
-//     generate_dot_dump(eqtree, is_simple, fp);
-//     fclose(fp);
-//
-//     char image_basename[256] = "";
-//     snprintf(image_basename, sizeof(image_basename), "tree_dump_%zu.svg", dump_counter);
-//
-//     char svg_path[512] = "";
-//     if (outdir_len && outdir[outdir_len - 1] == '/')
-//         snprintf(svg_path, sizeof(svg_path), "%s%s", outdir, image_basename);
-//     else
-//         snprintf(svg_path, sizeof(svg_path), "%s/%s", outdir, image_basename);
-//
-//     char command[1024] = "";
-//     snprintf(command, sizeof(command), "dot -Tsvg %s -o %s", dot_path, svg_path);
-//     (void) system(command);
-//
-//     if (out_basename && out_size > 0) {
-//         strncpy(out_basename, image_basename, out_size);
-//         out_basename[out_size - 1] = '\0';
-//     }
-//
-//     ++dump_counter;
-//     return 0;
-// }
-//
-// function void dump_internal(EQ_TREE_T *eqtree, bool is_simple, const char *fmt, va_list ap) {
-//     const char *dir = logger_get_active_dir();
-//     char basename[256] = "";
-//     int rc = generate_files(eqtree, is_simple, dir, basename, sizeof(basename));
-//
-//     FILE *log_file = logger_get_file();
-//     if (!log_file)
-//         return;
-//
-//     if (fmt != nullptr) {
-//         fprintf(log_file, "<p>");
-//         vfprintf(log_file, fmt, ap);
-//         fprintf(log_file, "</p>\n");
-//         fflush(log_file);
-//     }
-//     else {
-//         fprintf(log_file, "<p>Dump of %s</p>", eqtree->name);
-//         fflush(log_file);
-//     }
-//
-//     if (rc == 0 && basename[0] != '\0')
-//         fprintf(log_file, "<img src=\"%s\">\n", basename);
-//     else
-//         fprintf(log_file, "<p>SVG not generated</p>\n");
-//
-//     fflush(log_file);
-// }
-//
-// void full_dump(EQ_TREE_T *node) {
-//     va_list ap = {};
-//     dump_internal(node, false, nullptr, ap);
-// }
-//
-// void full_dump(EQ_TREE_T *node, const char *fmt, ...) {
-//     va_list ap = {};
-//     va_start(ap, fmt);
-//     dump_internal(node, false, fmt, ap);
-//     va_end(ap);
-// }
-//
-// void simple_dump(EQ_TREE_T *node) {
-//     va_list ap = {};
-//     dump_internal(node, true, nullptr, ap);
-// }
-//
-// void simple_dump(EQ_TREE_T *node, const char *fmt, ...) {
-//     va_list ap = {};
-//     va_start(ap, fmt);
-//     dump_internal(node, true, fmt, ap);
-//     va_end(ap);
-// }
 
 #define STR_CASE_(x) case x: return #x;
 
@@ -376,6 +112,282 @@ static const char *delimiter_name(DELIMITER::DELIMITER delim) {
 }
 
 #undef STR_CASE_
+
+function const char *node_type_color(const NODE_T *node) {
+    if (!node) return "#f2f2f2";
+    switch (node->type) {
+        case NUMBER_T: return "#fff2cc";
+        case OPERATOR_T:  return "#cfe2ff";
+        case IDENTIFIER_T: return "#d4f8d4";
+        case LITERAL_T: return "#d4f8d4";
+        case KEYWORD_T: return "#ffd9b3";
+        case DELIMITER_T: return "#e0e0e0";
+        default:    return "#f2f2f2";
+    }
+}
+
+function const char *node_type_shape(const NODE_T *node) {
+    if (!node) return "hexagon";
+    switch (node->type) {
+        case NUMBER_T: return "box";
+        case OPERATOR_T:  return "ellipse";
+        case IDENTIFIER_T: return "diamond";
+        case LITERAL_T: return "diamond";
+        case KEYWORD_T: return "ellipse";
+        case DELIMITER_T: return "octagon";
+        default:    return "hexagon";
+    }
+}
+
+function const char *node_type_font_size(const NODE_T *node) {
+    if (!node) return "10pt";
+    switch (node->type) {
+        case NUMBER_T: return "10pt";
+        case OPERATOR_T:  return "12pt";
+        case IDENTIFIER_T: return "10pt";
+        case LITERAL_T: return "10pt";
+        case KEYWORD_T: return "12pt";
+        case DELIMITER_T: return "10pt";
+        default:    return "10pt";
+    }
+}
+
+const char *operator_symbol(OPERATOR::OPERATOR op) {
+    switch (op) {
+        case OPERATOR::ADD:   return "+";
+        case OPERATOR::SUB:   return "-";
+        case OPERATOR::MUL:   return "*";
+        case OPERATOR::DIV:   return "/";
+        case OPERATOR::POW:   return "^";
+        case OPERATOR::LN:    return "ln";
+        case OPERATOR::SIN:   return "sin";
+        case OPERATOR::COS:   return "cos";
+        case OPERATOR::TAN:   return "tan";
+        case OPERATOR::CTG:   return "ctg";
+        case OPERATOR::ASIN:  return "arcsin";
+        case OPERATOR::ACOS:  return "arccos";
+        case OPERATOR::ATAN:  return "arctan";
+        case OPERATOR::ACTG:  return "arccot";
+        case OPERATOR::SQRT:  return "sqrt";
+        default:    return "?";
+    }
+}
+
+function void format_node_value(const FRONT_COMPL_T *ctx, const NODE_T *node, char *buf, size_t size) {
+    if (!node || !buf || !size) return;
+    switch (node->type) {
+        case NUMBER_T:
+            snprintf(buf, size, "%g", node->value.num);
+            break;
+        case OPERATOR_T:
+            snprintf(buf, size, "%s", operator_name(node->value.opr));
+            break;
+        case KEYWORD_T:
+            snprintf(buf, size, "%s", keyword_name(node->value.keyword));
+            break;
+        case IDENTIFIER_T:
+        case LITERAL_T: {
+            const mystr::mystr_t *entry = (ctx && ctx->vars) ? varlist::get(ctx->vars, node->value.id) : nullptr;
+            if (entry && entry->str)
+                snprintf(buf, size, "%s", entry->str);
+            else
+                snprintf(buf, size, "id_%zu", node->value.id);
+            break;
+        }
+        case DELIMITER_T:
+            snprintf(buf, size, "%s", delimiter_name(node->value.delimiter));
+            break;
+        default:
+            snprintf(buf, size, "-");
+            break;
+    }
+}
+
+function int write_node_full(const FRONT_COMPL_T *ctx, const NODE_T *subtree, FILE *fp, int *id_counter) {
+    if (!subtree || !fp || !id_counter) return -1;
+    int my_id = (*id_counter)++;
+
+    char value_buf[128] = "";
+    format_node_value(ctx, subtree, value_buf, sizeof(value_buf));
+
+    const char *color = node_type_color(subtree);
+
+        fprintf(fp,
+            "\tnode%d [label=\"{ type=%s | value=%s | { left=%p | right=%p } | parent=%p | size=%zu }\", shape=record, style=filled, fillcolor=\"%s\"];\n",
+            my_id,
+            node_type_name(subtree),
+            value_buf,
+            (void *)subtree->left,
+            (void *)subtree->right,
+            (void *)subtree->parent,
+            subtree->elements,
+            color);
+
+    if (subtree->left) {
+        int left_id = write_node_full(ctx, subtree->left, fp, id_counter);
+        if (left_id >= 0)
+            fprintf(fp, "\tnode%d -> node%d [color=\"#0c0ccc\", label=\"L\", constraint=true];\n", my_id, left_id);
+    }
+
+    if (subtree->right) {
+        int right_id = write_node_full(ctx, subtree->right, fp, id_counter);
+        if (right_id >= 0)
+            fprintf(fp, "\tnode%d -> node%d [color=\"#3dad3d\", label=\"R\", constraint=true];\n", my_id, right_id);
+    }
+
+    return my_id;
+}
+
+function int write_node_simple(const FRONT_COMPL_T *ctx, const NODE_T *subtree, FILE *fp, int *id_counter) {
+    if (!subtree || !fp || !id_counter) return -1;
+    int my_id = (*id_counter)++;
+
+    char value_buf[128] = "";
+    format_node_value(ctx, subtree, value_buf, sizeof(value_buf));
+
+    const char *shape = node_type_shape(subtree);
+    const char *color = node_type_color(subtree);
+    const char *fontsize = node_type_font_size(subtree);
+
+        fprintf(fp,
+            "\tnode%d [label=\"%s\", shape=%s, style=filled, fillcolor=\"%s\", fontsize=\"%s\"];\n",
+            my_id,
+            value_buf,
+            shape,
+            color,
+            fontsize
+        );
+
+    if (subtree->left) {
+        int left_id = write_node_simple(ctx, subtree->left, fp, id_counter);
+        if (left_id >= 0)
+            fprintf(fp, "\tnode%d -> node%d [color=\"#0c0ccc\", label=\"L\", constraint=true];\n", my_id, left_id);
+    }
+
+    if (subtree->right) {
+        int right_id = write_node_simple(ctx, subtree->right, fp, id_counter);
+        if (right_id >= 0)
+            fprintf(fp, "\tnode%d -> node%d [color=\"#3dad3d\", label=\"R\", constraint=true];\n", my_id, right_id);
+    }
+
+    return my_id;
+}
+
+function void generate_dot_dump(const FRONT_COMPL_T *ctx, bool is_simple, FILE *fp) {
+    if (!fp) return;
+    fprintf(fp,
+            "digraph EquationTree {\n"
+            "\trankdir=TB;\n"
+            "\tnode [fontname=\"Helvetica\", fontsize=10];\n"
+            "\tedge [arrowsize=0.8];\n"
+            "\tgraph [splines=true, concentrate=false];\n\n");
+
+    if (!ctx || !ctx->root) {
+        fprintf(fp, "\t// empty tree\n\n\tlabel = \"empty tree\";\n");
+        fprintf(fp, "}\n");
+        return;
+    }
+
+    int id_counter = 0;
+    if (is_simple)
+        write_node_simple(ctx, ctx->root, fp, &id_counter);
+    else
+        write_node_full(ctx, ctx->root, fp, &id_counter);
+    fprintf(fp, "}\n");
+}
+
+function int generate_files(const FRONT_COMPL_T *ctx, bool is_simple, const char *dir, char *out_basename, size_t out_size) {
+    local size_t dump_counter = 0;
+    const char *outdir = (dir && dir[0] != '\0') ? dir : ".";
+    size_t outdir_len = strlen(outdir);
+
+    char dot_path[512] = "";
+    if (outdir_len && outdir[outdir_len - 1] == '/')
+        snprintf(dot_path, sizeof(dot_path), "%stree_dump_%zu.dot.tmp", outdir, dump_counter);
+    else
+        snprintf(dot_path, sizeof(dot_path), "%s/tree_dump_%zu.dot.tmp", outdir, dump_counter);
+
+    FILE *fp = fopen(dot_path, "w");
+    if (!fp) return -1;
+
+    generate_dot_dump(ctx, is_simple, fp);
+    fclose(fp);
+
+    char image_basename[256] = "";
+    snprintf(image_basename, sizeof(image_basename), "tree_dump_%zu.svg", dump_counter);
+
+    char svg_path[512] = "";
+    if (outdir_len && outdir[outdir_len - 1] == '/')
+        snprintf(svg_path, sizeof(svg_path), "%s%s", outdir, image_basename);
+    else
+        snprintf(svg_path, sizeof(svg_path), "%s/%s", outdir, image_basename);
+
+    char command[1024] = "";
+    snprintf(command, sizeof(command), "dot -Tsvg %s -o %s", dot_path, svg_path);
+    (void) system(command);
+
+    if (out_basename && out_size > 0) {
+        strncpy(out_basename, image_basename, out_size);
+        out_basename[out_size - 1] = '\0';
+    }
+
+    ++dump_counter;
+    return 0;
+}
+
+function void dump_internal(const FRONT_COMPL_T *ctx, bool is_simple, const char *fmt, va_list ap) {
+    const char *dir = logger_get_active_dir();
+    char basename[256] = "";
+    int rc = generate_files(ctx, is_simple, dir, basename, sizeof(basename));
+
+    FILE *log_file = logger_get_file();
+    if (!log_file)
+        return;
+
+    if (fmt != nullptr) {
+        fprintf(log_file, "<p>");
+        vfprintf(log_file, fmt, ap);
+        fprintf(log_file, "</p>\n");
+        fflush(log_file);
+    }
+    else if (ctx && ctx->name) {
+        fprintf(log_file, "<p>Dump of %s</p>", ctx->name);
+        fflush(log_file);
+    }
+
+    if (rc == 0 && basename[0] != '\0')
+        fprintf(log_file, "<img src=\"%s\">\n", basename);
+    else
+        fprintf(log_file, "<p>SVG not generated</p>\n");
+
+    fflush(log_file);
+}
+
+void full_dump(const FRONT_COMPL_T *ctx) {
+    va_list ap = {};
+    dump_internal(ctx, false, nullptr, ap);
+}
+
+void full_dump(const FRONT_COMPL_T *ctx, const char *fmt, ...) {
+    va_list ap = {};
+    va_start(ap, fmt);
+    dump_internal(ctx, false, fmt, ap);
+    va_end(ap);
+}
+
+void simple_dump(const FRONT_COMPL_T *ctx) {
+    va_list ap = {};
+    dump_internal(ctx, true, nullptr, ap);
+}
+
+void simple_dump(const FRONT_COMPL_T *ctx, const char *fmt, ...) {
+    va_list ap = {};
+    va_start(ap, fmt);
+    dump_internal(ctx, true, fmt, ap);
+    va_end(ap);
+}
+
+
 
 static void html_escape(FILE *out, const char *text, size_t len) {
     if (!out || !text) return;

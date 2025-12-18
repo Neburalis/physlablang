@@ -56,33 +56,33 @@
                         )
                     )
                     (
-                        =
+                        ;
                         (
-                            LITERAL 5 "result"  
-                        )
-                        (
-                            *
+                            =
                             (
                                 LITERAL 5 "result"  
                             )
                             (
-                                FUNC_CALL
+                                *
+                                (
+                                    LITERAL 5 "result"  
+                                )
                                 (
                                     LITERAL 6 "i"  
                                 )
+                            )
+                        )
+                        (
+                            =
+                            (
+                                LITERAL 6 "i"  
+                            )
+                            (
+                                +
                                 (
-                                    =
-                                    (
-                                        LITERAL 6 "i"  
-                                    )
-                                    (
-                                        +
-                                        (
-                                            LITERAL 6 "i"  
-                                        )
-                                        1
-                                    )
+                                    LITERAL 6 "i"  
                                 )
+                                1
                             )
                         )
                     )
