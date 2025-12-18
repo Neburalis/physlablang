@@ -203,7 +203,7 @@ literal ::= [^\"^\n]*
 "РАССЧИТЫВАЕТСЯ ИЗ" -> KEYWORD.FUNC_CALL
 "ВЕЛИЧИНА" -> KEYWORD.VAR_DECLARATION
 "ЕСЛИ" -> KEYWORD.IF
-"ТО" -> KEYWORD.THEN
+"ТО" -> KEYWORD.
 "ИНАЧЕ" -> KEYWORD.ELSE
 "ВЫВЕСТИ" -> KEYWORD.OUT
 "ПОКАЗАТЬ" -> KEYWORD.OUT
@@ -290,7 +290,7 @@ op2
 ```
 дерево:
 ```
-(IF (expr) (KEYWORD.THEN (op1) (op2)))
+(IF (expr) (KEYWORD.ELSE (op1) (op2)))
 ```
 
 Если блока else нет, то вместо op2 -> nil
@@ -307,9 +307,9 @@ op2
 ```
 (
     IF (expr1) (
-        THEN (op1) (
+        ELSE (op1) (
             IF (expr2) (
-                THEN (
+                ELSE (
                     op2
                 ) (
                     op3
@@ -389,7 +389,7 @@ op2
             )
         )
         (
-            THEN
+            ELSE
             (
                 ASSIGNMENT
                 (
