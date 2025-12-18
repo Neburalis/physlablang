@@ -290,7 +290,7 @@ op2
 ```
 дерево:
 ```
-(KEYWORD.IF (expr) (KEYWORD.THEN (op1) (op2)))
+(IF (expr) (KEYWORD.THEN (op1) (op2)))
 ```
 
 Если блока else нет, то вместо op2 -> nil
@@ -306,10 +306,10 @@ op2
 создаст дерево:
 ```
 (
-    KEYWORD.IF (expr1) (
-        KEYWORD.THEN (op1) (
-            KEYWORD.IF (expr2) (
-                KEYWORD.THEN (
+    IF (expr1) (
+        THEN (op1) (
+            IF (expr2) (
+                THEN (
                     op2
                 ) (
                     op3
@@ -325,9 +325,8 @@ op2
 записываются в дерево в виде:
 ```
 (
-    LITERAL
-    id   ; индекс в массиве
-    text ; содержимое
+    "LITERAL" // Заковыченная строка
+    nil nil
 )
 ```
 
@@ -348,29 +347,69 @@ op2
 дерево:
 ```
 (
-    OPERATOR.CONNECTOR
+    ;
     (
-        OPERATOR.CONNECTOR
+        ;
         (
             KEYWORD.VAR_DECLARATION
-            (LITERAL 1 "x")
+            (
+                "x"
+                nil
+                nil
+            )
             nil
         )
         (
             OPERATOR.ASSIGNMENT
-            (LITERAL 1 "x")
-            0
+            (
+                "x"
+                nil
+                nil
+            )
+            (
+                0
+                nil
+                nil
+            )
         )
     )
     (
-        KEYWORD.IF
-        (OPERATOR.BELOW (LITERAL 1 "x") 5)
+        IF
         (
-            KEYWORD.THEN
+            <
             (
-                OPERATOR.ASSIGNMENT
-                (LITERAL 1 "x")
-                (OPERATOR.ADD (LITERAL 1 "x") 1)
+                "x"
+                nil
+                nil
+            )
+            (
+                3
+                nil
+                nil
+            )
+        )
+        (
+            THEN
+            (
+                ASSIGNMENT
+                (
+                    "x"
+                    nil
+                    nil
+                )
+                (
+                    +
+                    (
+                        "x"
+                        nil
+                        nil
+                    )
+                    (
+                        1
+                        nil
+                        nil
+                    )
+                )
             )
             nil
         )
@@ -386,7 +425,7 @@ id = expr
 Дерево:
 ```
 (
-    OPERATOR.ASSIGNMENT (id) (expr)
+    ASSIGNMENT (id) (expr)
 )
 ```
 
@@ -396,7 +435,7 @@ id = expr
 ```
 дерево:
 ```
-(KEYWORD.VAR_DECLARATION (id) nil)
+(VAR_DECLARATION (id) nil)
 ```
 
 ```
@@ -405,9 +444,9 @@ id = expr
 дерево
 ```
 (
-    OPERATOR.CONNECTOR
-    (KEYWORD.VAR_DECLARATION (id) nil)
-    (OPERATOR.ASSIGNMENT (id) (expr))
+    ;
+    (VAR_DECLARATION (id) nil)
+    (= (id) (expr))
 )
 ```
 
@@ -421,44 +460,44 @@ id = expr
 
 ```
 (
-    (LITERAL 1 "sum")
+    ("sum" nil nil)
     (
-        DELIMITER.COMA
-        (LITERAL 2 "a")
+        ,
+        ("a" nil nil)
         (
-            DELIMITER.COMA
-            (LITERAL 3 "b")
+            ,
+            ("b" nil nil)
             (
-                DELIMITER.COMA
-                (LITERAL 4 "c")
+                ,
+                ("c" nil nil)
                 nil
             )
         )
     )
     (
-        OPERATOR.CONNECTOR
+        ,
         (
-            OPERATOR.CONNECTOR
+            ,
             (
-                KEYWORD.VAR_DECLARATION
-                (LITERAL 5 "result")
+                VAR_DECLARATION
+                ("result" nil nil)
                 nil
             )
             (
-                OPERATOR.ASSIGNMENT
-                (LITERAL 5 "result")
+                =
+                ("result" nil nil)
                 (
-                    OPERATOR.ADD
-                    (LITERAL 2 "a")
+                    +
+                    ("a" nil nil)
                     (
-                        OPERATOR.ADD
-                        (LITERAL 3 "b")
-                        (LITERAL 4 "c")
+                        +
+                        ("b" nil nil)
+                        ("c" nil nil)
                     )
                 )
             )
         )
-        (KEYWORD.RETURN (LITERAL 5 "result") nil)
+        (RETURN ("result" nil nil) nil)
     )
 )
 ```
@@ -466,17 +505,17 @@ id = expr
 ### Вызов функций
 ```
 (
-    KEYWORD.FUNC_CALL
-    (LITERAL 1 "sum")
+    FUNC_CALL
+    ("sum" nil nil)
     (
-        DELIMITER.COMA
-        1
+        ,
+        (1 nil nil)
         (
-            DELIMITER.COMA
-            2
+            ,
+            (2 nil nil)
             (
-                DELIMITER.COMA
-                3
+                ,
+                (3 nil nil)
                 nil
             )
         )
@@ -490,30 +529,30 @@ id = expr
 
 Операторы ввода/вывода и встроенные алгебраические функции работают также как и простейшие математические функции (но в основном унарные а не бинарные)
 
-`ИЗМЕРИТЬ x -> (OPERATOR.IN  (LITERAL 1 "x") nil)`
+`ИЗМЕРИТЬ x -> (IN  ("x" nil nil) nil)`
 
-`sin (x) ->    (OPERATOR.SIN (LITERAL 1 "x") nil)`
+`sin (x) ->    (SIN ("x" nil nil) nil)`
 
-`ВЫВЕСТИ x ->  (OPERATOR.OUT (LITERAL 1 "x") nil)`
+`ВЫВЕСТИ x ->  (OUT ("x" nil nil) nil)`
 
 ### Операторы и выражения лежат "как есть"
 `x >= 0 И x + 1 < 15` ->
 ```
 (
-    OPERATOR.AND
+    +
     (
-        OPERATOR.ABOVE_EQ
-        (LITERAL 1 "x")
-        0
+        >=
+        ("x" nil nil)
+        (0 nil nil)
     )
     (
-        OPERATOR.BELOW
+        <
         (
-            OPERATOR.ADD
-            (LITERAL 1 "x")
-            1
+            +
+            ("x" nil nil)
+            (1 nil nil)
         )
-        15
+        (15 nil nil)
     )
 )
 ```
