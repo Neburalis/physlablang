@@ -4,3 +4,6 @@
 [submodule "external/string_and_thong"]
 	path = external/string_and_thong
 	url = git@github.com:Neburalis/string_and_thong.git
+[submodule "external/smart_stack"]
+	path = external/smart_stack
+	url = git@github.com:Neburalis/smart_stack.git

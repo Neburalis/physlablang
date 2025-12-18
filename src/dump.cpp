@@ -82,6 +82,8 @@ static const char *operator_name(OPERATOR::OPERATOR op) {
         STR_CASE_(OPERATOR::ATAN);
         STR_CASE_(OPERATOR::ACTG);
         STR_CASE_(OPERATOR::SQRT);
+        STR_CASE_(OPERATOR::DRAW);
+        STR_CASE_(OPERATOR::SET_PIXEL);
         STR_CASE_(OPERATOR::EQ);
         STR_CASE_(OPERATOR::NEQ);
         STR_CASE_(OPERATOR::BELOW);

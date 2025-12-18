@@ -12,6 +12,9 @@ struct parser_t {
     bool           error;
 };
 
+static void log_parse_state(parser_t *p, const char *reason);
+static void dump_token_brief(const TOKEN_T *tok, size_t idx);
+
 static NODE_T *get_program                  (parser_t *p);
 static NODE_T *get_report                   (parser_t *p);
 static NODE_T *get_annotation               (parser_t *p);
@@ -67,12 +70,37 @@ int parse_tokens(FRONT_COMPL_T *ctx) {
         return -1;
     parser_t p = { ctx, 0, false };
     NODE_T *root = get_program(&p);
-    if (p.error || !root)
+    if (p.error || !root) {
+        log_parse_state(&p, "parse failed");
         return -1;
+    }
     ctx->root = root;
     recount_elements(root);
     root->parent = nullptr;
     return 0;
+}
+
+static void dump_token_brief(const TOKEN_T *tok, size_t idx) {
+    if (!tok) return;
+    fprintf(stderr, "  token[%zu]: type=%d line=%d pos=%d", idx, tok->node.type, tok->line, tok->pos);
+    if (tok->text && tok->length) {
+        size_t snip = tok->length;
+        if (snip > 48) snip = 48;
+        fprintf(stderr, " text=\"%.*s\"%s", (int) snip, tok->text, (tok->length > snip) ? "..." : "");
+    }
+    fputc('\n', stderr);
+}
+
+static void log_parse_state(parser_t *p, const char *reason) {
+    if (!p || !p->ctx) return;
+    size_t pos = p->pos;
+    size_t last = (p->ctx->token_count > 0) ? p->ctx->token_count - 1 : 0;
+    size_t idx = (pos < p->ctx->token_count) ? pos : last;
+    TOKEN_T *tok = (p->ctx->token_count > 0) ? &p->ctx->tokens[idx] : nullptr;
+    fprintf(stderr, "parser error: %s\n", reason ? reason : "unknown");
+    fprintf(stderr, "  file: %s\n", p->ctx->name ? p->ctx->name : "<buffer>");
+    fprintf(stderr, "  tokens: %zu, at index %zu\n", p->ctx->token_count, idx);
+    if (tok) dump_token_brief(tok, idx);
 }
 
 /**

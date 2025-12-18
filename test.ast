@@ -67,7 +67,7 @@
                 (
                     WHILE
                     (
-                        <
+                        <=
                         (
                             "i"
                             nil
@@ -211,7 +211,7 @@
         (
             OUT
             (
-                "done"
+                1
                 nil
                 nil
             )

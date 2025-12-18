@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "var_list.h"
+
 const int32_t signature = (int32_t) 0x50C0C1;
 
 enum NODE_TYPE {
@@ -51,6 +53,8 @@ namespace OPERATOR {
         AND, OR, NOT,
         // io
         IN, OUT,
+        // graphic
+        SET_PIXEL, DRAW,
 
         ASSIGNMENT,
 
@@ -156,5 +160,29 @@ bool is_operator_stop(const TOKEN_T *tok, KEYWORD::KEYWORD stop_kw);
 
 bool     is_unary_builtin(OPERATOR::OPERATOR op);
 bool     is_binary_builtin(OPERATOR::OPERATOR op);
+
+/**
+ * @brief Загружает AST из текстового дампа (префиксная форма) в память.
+ * @param text  указатель на буфер с содержимым файла.
+ * @param len   длина буфера в байтах.
+ * @param root_out куда поместить корень дерева.
+ * @param vars_out указатель на VarList; будет инициализирован.
+ * @return 0 при успехе, -1 при ошибке.
+ */
+int load_ast_from_buffer(const char *text, size_t len, NODE_T **root_out, varlist::VarList *vars_out);
+
+/**
+ * @brief Загружает AST из файла.
+ * @param path путь к .ast файлу.
+ * @param root_out куда поместить корень дерева.
+ * @param vars_out указатель на VarList; будет инициализирован.
+ * @return 0 при успехе, -1 при ошибке.
+ */
+int load_ast_from_file(const char *path, NODE_T **root_out, varlist::VarList *vars_out);
+
+/**
+ * @brief Освобождает дерево и таблицу имён, созданные загрузчиком AST.
+ */
+void destroy_ast(NODE_T *root, varlist::VarList *vars);
 
 #endif // AST_H

@@ -106,6 +106,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    printf("MEOW\n");
+
     lexer_reset(&ctx);
     destruct_logger();
     return 0;

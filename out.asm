@@ -1,0 +1,34 @@
+IN
+POPR RAX
+PUSHR RAX
+CALL :factorial
+POPR RBX
+PUSHR RBX
+OUT
+PUSH 1
+OUT
+HLT
+:factorial
+POPR RAX
+PUSH 1
+POPR RBX
+PUSH 1
+POPR RCX
+:while_1
+PUSHR RCX
+PUSHR RAX
+JBE :while_1_body
+JMP :while_1_end
+:while_1_body
+PUSHR RBX
+PUSHR RCX
+MUL
+POPR RBX
+PUSHR RCX
+PUSH 1
+ADD
+POPR RCX
+JMP :while_1
+:while_1_end
+PUSHR RBX
+RET

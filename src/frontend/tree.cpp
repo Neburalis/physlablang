@@ -266,6 +266,8 @@ static const char *operator_name(OPERATOR::OPERATOR op) {
         CASE_(OPERATOR::ATAN, "ATAN");
         CASE_(OPERATOR::ACTG, "ACTG");
         CASE_(OPERATOR::SQRT, "SQRT");
+        CASE_(OPERATOR::DRAW, "DRAW");
+        CASE_(OPERATOR::SET_PIXEL, "SET_PIXEL");
         CASE_(OPERATOR::EQ, "==");
         CASE_(OPERATOR::NEQ, "!=");
         CASE_(OPERATOR::BELOW, "<");
@@ -316,61 +318,45 @@ static void write_node(FILE *fp, const FRONT_COMPL_T *ctx, const NODE_T *node, u
     }
 
     indent(fp, depth);
+    fputc('(', fp);
+    fputc('\n', fp);
     // fputc('\n', fp);
 
     depth++;
 
     switch (node->type) {
         case NUMBER_T:
-            fprintf(fp, "%g", node->value.num);
-            return;
+            ifprintf(depth, fp, "%g", node->value.num);
+            break;
         case OPERATOR_T:
-            fputc('(', fp);
-            fputc('\n', fp);
             ifprintf(depth, fp, "%s", operator_name(node->value.opr));
             break;
         case KEYWORD_T:
-            fputc('(', fp);
-            fputc('\n', fp);
             ifprintf(depth, fp, "%s", keyword_name(node->value.keyword));
             break;
         case LITERAL_T: {
-            fputc('(', fp);
-            fputc('\n', fp);
             char tmp[128];
             format_literal(ctx, node->value.id, tmp, sizeof(tmp));
-            ifprintf(depth, fp, "LITERAL %zu \"%s\"", node->value.id, tmp);
+            ifprintf(depth, fp, "\"%s\"", tmp);
             break;
         }
         case IDENTIFIER_T:
-            fputc('(', fp);
-            fputc('\n', fp);
             ifprintf(depth, fp, "IDENTIFIER %zu", node->value.id);
             break;
         case DELIMITER_T:
-            fputc('(', fp);
-            fputc('\n', fp);
             ifprintf(depth, fp, "%s", delimiter_name(node->value.delimiter));
             break;
         default:
-            fputc('(', fp);
-            fputc('\n', fp);
             ifprintf(depth, fp, "UNKNOWN");
             break;
     }
 
-    if (!node->left)
-        fputc('nil ', fp);
-    else {
-        fputc('\n', fp);
-        write_node(fp, ctx, node->left, depth);
-    }
-    if (!node->right)
-        fputc('nil ', fp);
-    else {
-        fputc('\n', fp);
-        write_node(fp, ctx, node->right, depth);
-    }
+    fputc('\n', fp);
+    write_node(fp, ctx, node->left, depth);
+
+    fputc('\n', fp);
+    write_node(fp, ctx, node->right, depth);
+
     fputc('\n', fp);
     ifprintf(--depth, fp, ")");
 }
