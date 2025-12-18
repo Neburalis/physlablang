@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    int rc = emit_program(root, &vars, out);
+    int rc = reverse_program(root, &vars, out);
     if (out && out != stdout)
         fclose(out);
 

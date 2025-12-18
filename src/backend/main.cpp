@@ -37,15 +37,18 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    FILE *fp = fopen(output, "w");
+    FILE *fp = stdout;
+    if (output)
+        fp = fopen(output, "w");
     if (!fp) {
         fprintf(stderr, "cannot open %s for writing\n", output);
         destroy_ast(root, &vars);
         return 1;
     }
 
-    int rc = emit_program(root, &vars, fp);
-    fclose(fp);
+    int rc = reverse_program(root, &vars, fp);
+    if (fp && fp != stdout)
+        fclose(fp);
     destroy_ast(root, &vars);
 
     return rc ? 1 : 0;

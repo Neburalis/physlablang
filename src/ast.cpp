@@ -127,13 +127,11 @@ bool is_operator_start(const TOKEN_T *tok) {
     if (tok->node.type == IDENTIFIER_T)
         return true;
     if (tok->node.type == OPERATOR_T) {
-        switch (tok->node.value.opr) {
-            case OPERATOR::OUT:
-            case OPERATOR::IN:
-                return true;
-            default:
-                break;
-        }
+        OPERATOR::OPERATOR op = tok->node.value.opr;
+        if (op == OPERATOR::OUT || op == OPERATOR::IN)
+            return true;
+        if (is_unary_builtin(op) || is_binary_builtin(op))
+            return true;
     }
     return false;
 }

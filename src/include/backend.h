@@ -6,6 +6,6 @@
 /**
  * @brief Точка входа генерации: main-тело + функции + HLT.
  */
-int emit_program(NODE_T *root, varlist::VarList *vars, FILE *out);
+int reverse_program(NODE_T *root, varlist::VarList *vars, FILE *out);
 
 #endif // BACKEND_H

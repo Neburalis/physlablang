@@ -36,6 +36,9 @@ function int add_binding(func_ctx_t *ctx, const mystr::mystr_t *name, const char
 function const char *ensure_binding(func_ctx_t *ctx, const mystr::mystr_t *name);
 function int collect_params(func_ctx_t *ctx, const NODE_T *node);
 function void collect_args_in_order(const NODE_T *node, const NODE_T **dst, size_t *count, size_t cap);
+function int emit_builtin_draw(func_ctx_t *ctx, const NODE_T *args, FILE *out);
+function int emit_builtin_set_pixel(func_ctx_t *ctx, const NODE_T *args, FILE *out);
+function const char *alloc_temp_reg(const func_ctx_t *ctx);
 function int emit_call(func_ctx_t *ctx, const NODE_T *node, FILE *out);
 function int emit_assignment(func_ctx_t *ctx, const NODE_T *node, FILE *out, bool keep);
 function int emit_comparison_value(func_ctx_t *ctx, const NODE_T *node, FILE *out);
@@ -44,6 +47,17 @@ function int emit_conditional(func_ctx_t *ctx, const NODE_T *node, const char *t
 function int emit_statement(func_ctx_t *ctx, const NODE_T *node, FILE *out, bool *did_ret);
 function int emit_function(const varlist::VarList *globals, const NODE_T *node, FILE *out);
 function int emit_function_list(const varlist::VarList *globals, const NODE_T *node, FILE *out);
+function int emit_builtin_draw(func_ctx_t *ctx, const NODE_T *args, FILE *out);
+function int emit_builtin_set_pixel(func_ctx_t *ctx, const NODE_T *args, FILE *out);
+function const char *alloc_temp_reg(const func_ctx_t *ctx);
+
+
+typedef int (*emit_builtin_func)(func_ctx_t *ctx, const NODE_T *args, FILE *out);
+
+global struct {mystr::mystr_t name; emit_builtin_func func;} builtin_funcs[] = {
+    {.name = mystr::construct("DRAW"),      .func = emit_builtin_draw},
+    {.name = mystr::construct("SET_PIXEL"), .func = emit_builtin_set_pixel},
+};
 
 /**
  * @brief Формирует текст метки вида :prefix<id>suffix.
@@ -130,6 +144,23 @@ function int collect_params(func_ctx_t *ctx, const NODE_T *node) {
     return 0;
 }
 
+function bool reg_used(const func_ctx_t *ctx, const char *reg) {
+    if (!ctx || !reg) return true;
+    for (size_t i = 0; i < ctx->bind_count; ++i) {
+        if (ctx->bindings[i].reg && strcmp(ctx->bindings[i].reg, reg) == 0)
+            return true;
+    }
+    return false;
+}
+
+function const char *alloc_temp_reg(const func_ctx_t *ctx) {
+    for (size_t i = 0; i < ARRAY_COUNT(REGISTERS); ++i) {
+        if (!reg_used(ctx, REGISTERS[i]))
+            return REGISTERS[i];
+    }
+    return nullptr;
+}
+
 /**
  * @brief Собирает аргументы вызова слева направо в массив.
  */
@@ -143,6 +174,51 @@ function void collect_args_in_order(const NODE_T *node, const NODE_T **dst, size
     dst[(*count)++] = node;
 }
 
+function int emit_builtin_draw(func_ctx_t *ctx, const NODE_T *args, FILE *out) {
+    (void) ctx;
+    const NODE_T *ordered[2] = {};
+    size_t count = 0;
+    collect_args_in_order(args, ordered, &count, ARRAY_COUNT(ordered));
+    if (count != 1) {
+        fprintf(stderr, "DRAW ожидает ровно 1 числовой аргумент задержки\n");
+        return -1;
+    }
+    const NODE_T *arg = ordered[0];
+    if (arg->type != NUMBER_T) {
+        fprintf(stderr, "целевой процессор пока не поддерживает DRAW с нечисловым аргументом\n");
+        return -1;
+    }
+    fprintf(out, "DRAW %.0f\n", arg->value.num);
+    return 0;
+}
+
+function int emit_builtin_set_pixel(func_ctx_t *ctx, const NODE_T *args, FILE *out) {
+    const NODE_T *ordered[3] = {};
+    size_t count = 0;
+    collect_args_in_order(args, ordered, &count, ARRAY_COUNT(ordered));
+    if (count != 2) {
+        fprintf(stderr, "SET_PIXEL ожидает 2 аргумента: значение, индекс\n");
+        return -1;
+    }
+    const NODE_T *val_node = ordered[0];
+    const NODE_T *idx_node = ordered[1];
+
+    const char *tmp_reg = alloc_temp_reg(ctx);
+    if (!tmp_reg) {
+        fprintf(stderr, "нет свободных регистров для SET_PIXEL\n");
+        return -1;
+    }
+
+    /* addr -> tmp_reg */
+    if (emit_expression(ctx, idx_node, out)) return -1;
+    fprintf(out, "POPR %s\n", tmp_reg);
+
+    /* val -> mem[tmp_reg] */
+    if (emit_expression(ctx, val_node, out)) return -1;
+    fprintf(out, "POPM [%s]\n", tmp_reg);
+    return 0;
+}
+
 /**
  * @brief Генерирует вызов пользовательской функции.
  */
@@ -152,6 +228,11 @@ function int emit_call(func_ctx_t *ctx, const NODE_T *node, FILE *out) {
     const NODE_T *args = node->right;
     const mystr::mystr_t *fname = literal_name(ctx->globals, name_node);
     if (!fname || !fname->str) return -1;
+
+    for (int builtin_idx = 0; builtin_idx < ARRAY_COUNT(builtin_funcs); ++builtin_idx) {
+        if (builtin_funcs[builtin_idx].name.is_same(fname))
+            return builtin_funcs[builtin_idx].func(ctx, args, out);
+    }
 
     const NODE_T *ordered[16] = {};
     size_t count = 0;
@@ -210,7 +291,7 @@ function int emit_expression(func_ctx_t *ctx, const NODE_T *node, FILE *out) {
             const mystr::mystr_t *nm = literal_name(ctx->globals, node);
             const char *reg = binding_reg(ctx, nm);
             if (!nm || !reg) {
-                fprintf(stderr, "строковые литералы не поддерживаются бэкендом SPU\n");
+                fprintf(stderr, "целевой процессор пока не поддерживает строковые литералы\n");
                 return -1;
             }
             fprintf(out, "PUSHR %s\n", reg);
@@ -251,6 +332,27 @@ function int emit_expression(func_ctx_t *ctx, const NODE_T *node, FILE *out) {
                 case OPERATOR::CONNECTOR:
                     if (emit_expression(ctx, node->left, out)) return -1;
                     return emit_expression(ctx, node->right, out);
+                case OPERATOR::SET_PIXEL: {
+                    const char *tmp_reg = alloc_temp_reg(ctx);
+                    if (!tmp_reg) {
+                        fprintf(stderr, "нет свободных регистров для SET_PIXEL\n");
+                        return -1;
+                    }
+                    if (emit_expression(ctx, node->right, out)) return -1;
+                    fprintf(out, "POPR %s\n", tmp_reg);
+                    if (emit_expression(ctx, node->left, out)) return -1;
+                    fprintf(out, "POPM [%s]\n", tmp_reg);
+                    return 0;
+                }
+                case OPERATOR::DRAW: {
+                    const NODE_T *arg = node->left;
+                    if (!arg || arg->type != NUMBER_T) {
+                        fprintf(stderr, "целевой процессор пока не поддерживает DRAW с нечисловым аргументом\n");
+                        return -1;
+                    }
+                    fprintf(out, "DRAW %.0f\n", arg->value.num);
+                    return 0;
+                }
                 case OPERATOR::IN:
                 case OPERATOR::OUT:
                 case OPERATOR::POW:
@@ -456,7 +558,7 @@ function int emit_function_list(const varlist::VarList *globals, const NODE_T *n
 /**
  * @brief Точка входа генерации: main-тело + функции + HLT.
  */
-int emit_program(NODE_T *root, varlist::VarList *vars, FILE *out) {
+int reverse_program(NODE_T *root, varlist::VarList *vars, FILE *out) {
     if (!root || !vars || !out) return -1;
     const NODE_T *funcs = nullptr;
     const NODE_T *body = nullptr;

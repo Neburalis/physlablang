@@ -14,6 +14,6 @@
  * @param out  Открытый поток вывода; не закрывается внутри.
  * @return 0 при успехе, -1 при ошибке записи/аргументов.
  */
-int emit_program(NODE_T *root, varlist::VarList *vars, FILE *out);
+int reverse_program(NODE_T *root, varlist::VarList *vars, FILE *out);
 
 #endif // REV_FRONT_H

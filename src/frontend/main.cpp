@@ -9,40 +9,29 @@
 
 #include "frontend.h"
 #include "logger.h"
+#include "io_utils.h"
+#include "base.h"
 
-static int ensure_dir(const char *path) {
-    if (!path || !*path)
-        return -1;
-    struct stat st = {};
-    char buf[PATH_MAX] = "";
-    size_t len = strlen(path);
-    if (len >= sizeof(buf))
-        return -1;
-    memcpy(buf, path, len + 1);
-    for (size_t i = 1; i <= len; ++i) {
-        if (buf[i] == '/' || buf[i] == '\0') {
-            char saved = buf[i];
-            buf[i] = '\0';
-            if (*buf) {
-                if (stat(buf, &st) != 0) {
-#if defined(_WIN32)
-                    if (mkdir(buf) != 0 && errno != EEXIST)
-                        return -1;
-#else
-                    if (mkdir(buf, 0755) != 0 && errno != EEXIST)
-                        return -1;
-#endif
-                } else if (!S_ISDIR(st.st_mode)) {
-                    return -1;
-                }
-            }
-            buf[i] = saved;
-        }
-    }
-    return 0;
+function void usage(const char *prog) {
+    fprintf(stderr, "usage: %s <input.physlab> [output.ast]\n", prog ? prog : "frontend");
 }
 
 int main(int argc, char **argv) {
+    const char *input = nullptr;
+    const char *output = nullptr;
+
+    if (argc < 2) {
+        usage(argc ? argv[0] : "frontend");
+        return 1;
+    }
+    input = argv[1];
+    if (!input || !*input) {
+        usage(argc ? argv[0] : "frontend");
+        return 1;
+    }
+    if (argc > 2 && argv[2] && argv[2][0])
+        output = argv[2];
+
     char exe_path[PATH_MAX] = ".";
     if (realpath(argv[0], exe_path) == nullptr)
         strncpy(exe_path, ".", sizeof(exe_path));
@@ -58,19 +47,10 @@ int main(int argc, char **argv) {
         base_dir[total] = '\0';
     }
 
-    char default_input[PATH_MAX] = "";
-    snprintf(default_input, sizeof(default_input), "%s/examples/factorial.phylab", base_dir);
-    char default_log[PATH_MAX] = "";
-    snprintf(default_log, sizeof(default_log), "%s/log", base_dir);
+    char logdir[PATH_MAX] = "";
+    snprintf(logdir, sizeof(logdir), "%s/log", base_dir);
 
-    const char *input = default_input;
-    const char *logdir = default_log;
-    if (argc > 1 && argv[1] && argv[1][0])
-        input = argv[1];
-    if (argc > 2 && argv[2] && argv[2][0])
-        logdir = argv[2];
-
-    if (ensure_dir(logdir) != 0) {
+    if (create_folder_if_not_exists(logdir) != 0) {
         fprintf(stderr, "cannot create log directory \"%s\"\n", logdir);
         return 1;
     }
@@ -99,7 +79,9 @@ int main(int argc, char **argv) {
     full_dump(&ctx);
     simple_dump(&ctx);
 
-    if (save_ast_to_file(&ctx, "test.ast")) {
+    output = (output && output[0]) ? output : "out.ast";
+
+    if (save_ast_to_file(&ctx, output)) {
         fprintf(stderr, "save failed");
         lexer_reset(&ctx);
         destruct_logger();

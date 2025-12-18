@@ -439,7 +439,7 @@ function NODE_T *extract_res(NODE_T *root) {
     return nullptr;
 }
 
-int emit_program(NODE_T *root, varlist::VarList *vars, FILE *out) {
+int reverse_program(NODE_T *root, varlist::VarList *vars, FILE *out) {
     if (!root || !vars || !out)
         return -1;
 
